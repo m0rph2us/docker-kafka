@@ -1,0 +1,182 @@
+version: '3'
+services:
+
+  zookeeper-1:
+    image: debezium/zookeeper:1.1.0.Final
+    ports:
+      - 21810:2181
+      - 28880:2888
+      - 38880:3888
+    environment:
+      - SERVER_ID=1
+      - SERVER_COUNT=3
+      # This container's JVM default -Xmx value is 1000mb.
+      # For increase the heap size, use ZK_SERVER_HEAP environment variable(in this case, unit is always in mb).
+      - ZK_SERVER_HEAP=1024
+      - LOG_LEVEL=INFO,ROLLINGFILE
+      - TZ=Asia/Seoul
+#    volumes:
+#      - ./volume/zookeeper-1/data:/zookeeper/data
+#      - ./volume/zookeeper-1/txns:/zookeeper/txns
+#      - ./volume/zookeeper-1/conf:/zookeeper/conf
+#      - ./volume/zookeeper-1/logs:/zookeeper/logs
+    networks:
+      - kafka-docker-net
+
+  zookeeper-2:
+    image: debezium/zookeeper:1.1.0.Final
+    ports:
+      - 21811:2181
+      - 28881:2888
+      - 38881:3888
+    environment:
+      - SERVER_ID=2
+      - SERVER_COUNT=3
+      # This container's JVM default -Xmx value is 1000mb.
+      # For increase the heap size, use ZK_SERVER_HEAP environment variable(in this case, unit is always in mb).
+      - ZK_SERVER_HEAP=1024
+      - LOG_LEVEL=INFO,ROLLINGFILE
+      - TZ=Asia/Seoul
+#    volumes:
+#      - ./volume/zookeeper-2/data:/zookeeper/data
+#      - ./volume/zookeeper-2/txns:/zookeeper/txns
+#      - ./volume/zookeeper-2/conf:/zookeeper/conf
+#      - ./volume/zookeeper-2/logs:/zookeeper/logs
+    networks:
+      - kafka-docker-net
+
+  zookeeper-3:
+    image: debezium/zookeeper:1.1.0.Final
+    ports:
+      - 21812:2181
+      - 28882:2888
+      - 38882:3888
+    environment:
+      - SERVER_ID=3
+      - SERVER_COUNT=3
+      # This container's JVM default -Xmx value is 1000mb.
+      # For increase the heap size, use ZK_SERVER_HEAP environment variable(in this case, unit is always in mb).
+      - ZK_SERVER_HEAP=1024
+      - LOG_LEVEL=INFO,ROLLINGFILE
+      - TZ=Asia/Seoul
+#    volumes:
+#      - ./volume/zookeeper-3/data:/zookeeper/data
+#      - ./volume/zookeeper-3/txns:/zookeeper/txns
+#      - ./volume/zookeeper-3/conf:/zookeeper/conf
+#      - ./volume/zookeeper-3/logs:/zookeeper/logs
+    networks:
+      - kafka-docker-net
+
+  kafka-1:
+    image: debezium/kafka:1.1.0.Final
+    ports:
+      - 9092:9092
+      - 9012:9012
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      - BROKER_ID=1
+      - ZOOKEEPER_CONNECT=zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181/kafka
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - HEAP_OPTS=true
+      - KAFKA_HEAP_OPTS=-Xmx1G
+      - ADVERTISED_PORT=9092
+      - ADVERTISED_HOST_NAME=10.200.10.1
+      - JMXPORT=9012
+      - JMXHOST=10.200.10.1
+      - TZ=Asia/Seoul
+#    volumes:
+#      - ./volume/kafka-1/data:/kafka/data
+#      - ./volume/kafka-1/logs:/kafka/logs
+#      - ./volume/kafka-1/config:/kafka/config
+    networks:
+      - kafka-docker-net
+
+  kafka-2:
+    image: debezium/kafka:1.1.0.Final
+    ports:
+      - 9093:9092
+      - 9013:9012
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      - BROKER_ID=2
+      - ZOOKEEPER_CONNECT=zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181/kafka
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - HEAP_OPTS=true
+      - KAFKA_HEAP_OPTS=-Xmx1G
+      - ADVERTISED_PORT=9093
+      - ADVERTISED_HOST_NAME=10.200.10.1
+      - JMXPORT=9013
+      - JMXHOST=10.200.10.1
+      - TZ=Asia/Seoul
+#    volumes:
+#      - ./volume/kafka-2/data:/kafka/data
+#      - ./volume/kafka-2/logs:/kafka/logs
+#      - ./volume/kafka-2/config:/kafka/config
+    networks:
+      - kafka-docker-net
+
+  kafka-3:
+    image: debezium/kafka:1.1.0.Final
+    ports:
+      - 9094:9092
+      - 9014:9012
+    depends_on:
+      - zookeeper-1
+      - zookeeper-2
+      - zookeeper-3
+    environment:
+      - BROKER_ID=3
+      - ZOOKEEPER_CONNECT=zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181/kafka
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=false
+      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=3
+      - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=2
+      - KAFKA_MIN_INSYNC_REPLICAS=2
+      - HEAP_OPTS=true
+      - KAFKA_HEAP_OPTS=-Xmx1G
+      - ADVERTISED_PORT=9094
+      - ADVERTISED_HOST_NAME=10.200.10.1
+      - JMXPORT=9014
+      - JMXHOST=10.200.10.1
+      - TZ=Asia/Seoul
+#    volumes:
+#      - ./volume/kafka-3/data:/kafka/data
+#      - ./volume/kafka-3/logs:/kafka/logs
+#      - ./volume/kafka-3/config:/kafka/config
+    networks:
+      - kafka-docker-net
+
+  kafka-manager:
+    image: kafkamanager/kafka-manager:3.0.0.4
+    ports:
+      - 9000:9000
+    environment:
+      - ZK_HOSTS=zookeeper-1:2181,zookeeper-2:2181,zookeeper-3:2181/kafka
+      - KAFKA_MANAGER_AUTH_ENABLED=true
+      - KAFKA_MANAGER_USERNAME=test
+      - KAFKA_MANAGER_PASSWORD=1234
+      - TZ=Asia/Seoul
+    networks:
+      - kafka-docker-net
+
+networks:
+  kafka-docker-net:
+    external:
+      name: kafka-docker-net
